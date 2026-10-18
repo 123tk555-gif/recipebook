@@ -1,10 +1,77 @@
 /*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
+ * 見やすさの方針(要件定義書より): 大きめの文字・高コントラスト・色だけに頼らない表示・キーボード操作。
+ * 文字と背景のコントラスト比は 7 以上にしている。
  */
+:root {
+  --text: #1a1a1a;
+  --background: #ffffff;
+  --muted: #3d3d3d;
+  --accent: #0b4a8f;
+  --border: #5c5c5c;
+  --notice-bg: #e6f2e6;
+  --alert-bg: #fde8e8;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  font-size: 20px;
+  line-height: 1.7;
+  color: var(--text);
+  background: var(--background);
+}
+
+a { color: var(--accent); text-underline-offset: 0.2em; }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 4px solid #ffb000;
+  outline-offset: 2px;
+}
+
+.skip-link { position: absolute; left: -999px; }
+.skip-link:focus { left: 8px; top: 8px; background: #fff; padding: 8px; z-index: 10; }
+
+.site-header {
+  display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center;
+  padding: 12px 16px; border-bottom: 3px solid var(--text);
+}
+.site-header nav { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; }
+.brand { font-size: 1.3em; font-weight: bold; color: var(--text); text-decoration: none; }
+.who { color: var(--muted); }
+
+main { max-width: 960px; margin: 0 auto; padding: 16px; }
+
+.flash { padding: 12px 16px; border: 2px solid var(--border); border-radius: 6px; }
+.flash.notice { background: var(--notice-bg); }
+.flash.alert { background: var(--alert-bg); border-color: #8a1c1c; }
+
+.errors { background: var(--alert-bg); border: 2px solid #8a1c1c; border-radius: 6px; padding: 8px 16px; margin-bottom: 16px; }
+
+label { display: block; font-weight: bold; }
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], textarea {
+  width: 100%; font: inherit; padding: 8px; border: 2px solid var(--border); border-radius: 6px;
+}
+input[type="checkbox"] { width: 1.2em; height: 1.2em; vertical-align: middle; }
+input[type="checkbox"] + label { display: inline; font-weight: normal; }
+
+button, input[type="submit"], .button {
+  font: inherit; padding: 8px 16px; border: 2px solid var(--accent); border-radius: 6px;
+  background: var(--accent); color: #fff; cursor: pointer; text-decoration: none; display: inline-block;
+}
+.link-button { background: none; color: var(--accent); border: none; text-decoration: underline; padding: 0; }
+
+fieldset { border: 2px solid var(--border); border-radius: 6px; margin: 16px 0; }
+.row { display: grid; grid-template-columns: 1fr; gap: 4px; margin-bottom: 12px; }
+@media (min-width: 640px) { .row { grid-template-columns: auto 1fr auto 8em; align-items: center; } }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.card { border: 2px solid var(--border); border-radius: 8px; padding: 12px; }
+.card img, .photo { max-width: 100%; height: auto; border-radius: 6px; }
+.card h2 { font-size: 1.1em; margin: 8px 0 4px; }
+.meta { color: var(--muted); margin: 0; }
+.badge { border: 2px solid var(--text); border-radius: 4px; padding: 0 6px; font-size: 0.85em; }
+.tag { display: inline-block; border: 1px solid var(--border); border-radius: 4px; padding: 0 6px; margin: 2px 0; }
+.actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.trash li { margin-bottom: 12px; }
+.trash form { display: inline; }

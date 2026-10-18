@@ -1,0 +1,14 @@
+<% content_for :title, "ログイン" %>
+<h1>ログイン</h1>
+<%= form_with url: session_path do |form| %>
+  <p>
+    <%= form.label :email_address, "メールアドレス" %>
+    <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", value: params[:email_address] %>
+  </p>
+  <p>
+    <%= form.label :password, "パスワード" %>
+    <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72 %>
+  </p>
+  <p><%= form.submit "ログイン" %></p>
+<% end %>
+<p><%= link_to "パスワードを忘れたとき", new_password_path %> / <%= link_to "会員登録", new_registration_path %></p>

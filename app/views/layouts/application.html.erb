@@ -1,28 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
-    <title><%= content_for(:title) || "Recipebook" %></title>
+    <title><%= content_for(:title) || "レシピ管理" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Recipebook">
+    <meta name="application-name" content="レシピ管理">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
   </head>
 
   <body>
-    <%= yield %>
+    <a class="skip-link" href="#main">本文へ移動</a>
+    <header class="site-header">
+      <%= link_to "レシピ管理", root_path, class: "brand" %>
+      <nav aria-label="メニュー">
+        <% if authenticated? %>
+          <%= link_to "レシピを書く", new_recipe_path %>
+          <%= link_to "マイレシピ", my_recipes_path %>
+          <%= link_to "ゴミ箱", trashed_recipes_path %>
+          <span class="who"><%= current_user.display_name %> さん</span>
+          <%= button_to "ログアウト", session_path, method: :delete, class: "link-button" %>
+        <% else %>
+          <%= link_to "ログイン", new_session_path %>
+          <%= link_to "会員登録", new_registration_path %>
+        <% end %>
+      </nav>
+    </header>
+
+    <main id="main">
+      <% if notice.present? %><p class="flash notice" role="status">お知らせ: <%= notice %></p><% end %>
+      <% if alert.present? %><p class="flash alert" role="alert">エラー: <%= alert %></p><% end %>
+      <%= yield %>
+    </main>
   </body>
 </html>

@@ -1,0 +1,47 @@
+<% content_for :title, @recipe.title %>
+<% if @recipe.trashed? %>
+  <p class="flash alert" role="status">注意: このレシピはゴミ箱に入っています(あと<%= @recipe.days_until_purge %>日で完全に削除されます)。</p>
+<% end %>
+<article class="recipe">
+  <h1><%= @recipe.title %></h1>
+  <p class="meta">
+    <%= @recipe.user.display_name %> さん
+    <% if @recipe.cooking_minutes %>/ 調理時間 <%= @recipe.cooking_minutes %>分<% end %>
+    <% if @recipe.servings %>/ <%= @recipe.servings %>人分<% end %>
+    / <strong class="badge"><%= @recipe.published? ? "公開" : "非公開" %></strong>
+  </p>
+  <% if @recipe.photo.attached? %>
+    <%= image_tag @recipe.photo.variant(:medium), alt: "#{@recipe.title}の写真", class: "photo" %>
+  <% end %>
+  <% if @recipe.description.present? %><p><%= simple_format(h(@recipe.description)) %></p><% end %>
+  <% if @recipe.tags.any? %>
+    <p class="tags"><% @recipe.tags.each do |tag| %><span class="tag">#<%= tag.name %></span> <% end %></p>
+  <% end %>
+
+  <h2>材料</h2>
+  <ul>
+    <% @recipe.ingredients.each do |ingredient| %>
+      <li><%= ingredient.name %> <%= ingredient.quantity %></li>
+    <% end %>
+  </ul>
+
+  <h2>作り方</h2>
+  <ol>
+    <% @recipe.steps.each do |step| %>
+      <li><%= step.body %></li>
+    <% end %>
+  </ol>
+
+  <% if @recipe.editable_by?(current_user) %>
+    <p class="actions">
+      <% if @recipe.trashed? %>
+        <%= button_to "元に戻す", restore_trashed_recipe_path(@recipe), method: :post %>
+      <% else %>
+        <%= link_to "編集", edit_recipe_path(@recipe), class: "button" %>
+        <%= button_to "ゴミ箱に移す", recipe_path(@recipe), method: :delete,
+                      form: { data: { turbo_confirm: "ゴミ箱に移します。#{Recipe::TRASH_DAYS}日以内なら元に戻せます。" } } %>
+      <% end %>
+    </p>
+  <% end %>
+</article>
+<p><%= link_to "レシピ一覧に戻る", root_path %></p>

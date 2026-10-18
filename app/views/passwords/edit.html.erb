@@ -1,0 +1,14 @@
+<% content_for :title, "新しいパスワード" %>
+<h1>新しいパスワードを決める</h1>
+
+<%= form_with url: password_path(params[:token]), method: :put do |form| %>
+  <p>
+    <%= form.label :password, "新しいパスワード(8文字以上)" %>
+    <%= form.password_field :password, required: true, minlength: 8, autocomplete: "new-password", maxlength: 72, autofocus: true %>
+  </p>
+  <p>
+    <%= form.label :password_confirmation, "新しいパスワード(確認)" %>
+    <%= form.password_field :password_confirmation, required: true, minlength: 8, autocomplete: "new-password", maxlength: 72 %>
+  </p>
+  <p><%= form.submit "保存する" %></p>
+<% end %>

@@ -1,0 +1,29 @@
+public_one:
+  user: one
+  title: 太郎の公開カレー
+  description: 辛口です
+  cooking_minutes: 40
+  servings: 4
+  published: true
+
+private_one:
+  user: one
+  title: 太郎の非公開レシピ
+  published: false
+
+public_two:
+  user: two
+  title: 花子の公開サラダ
+  published: true
+
+trashed_one:
+  user: one
+  title: 太郎のゴミ箱レシピ
+  published: true
+  deleted_at: <%= 3.days.ago.to_fs(:db) %>
+
+expired_one:
+  user: one
+  title: 期限切れのレシピ
+  published: true
+  deleted_at: <%= 31.days.ago.to_fs(:db) %>

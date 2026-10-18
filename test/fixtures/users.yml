@@ -1,0 +1,17 @@
+<% password_digest = BCrypt::Password.create("password") %>
+
+one:
+  email_address: one@example.com
+  password_digest: <%= password_digest %>
+  display_name: 太郎
+
+two:
+  email_address: two@example.com
+  password_digest: <%= password_digest %>
+  display_name: 花子
+
+suspended:
+  email_address: suspended@example.com
+  password_digest: <%= password_digest %>
+  display_name: 停止中
+  suspended: true

@@ -1,0 +1,21 @@
+<% content_for :title, "ゴミ箱" %>
+<h1>ゴミ箱</h1>
+<p>ゴミ箱に入れてから<%= Recipe::TRASH_DAYS %>日たったレシピは、自動で完全に削除されます。</p>
+<% if @recipes.empty? %>
+  <p>ゴミ箱は空です。</p>
+<% else %>
+  <%= button_to "ゴミ箱を空にする", empty_trashed_recipes_path, method: :delete,
+                form: { data: { turbo_confirm: "ゴミ箱のレシピをすべて完全に削除します。元に戻せません。" } } %>
+  <ul class="trash">
+    <% @recipes.each do |recipe| %>
+      <li>
+        <%= link_to recipe.title, recipe %>
+        (あと<%= recipe.days_until_purge %>日で完全に削除)
+        <%= button_to "元に戻す", restore_trashed_recipe_path(recipe), method: :post %>
+        <%= button_to "完全に削除", trashed_recipe_path(recipe), method: :delete,
+                      form: { data: { turbo_confirm: "「#{recipe.title}」を完全に削除します。元に戻せません。" } } %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
+<p><%= link_to "マイレシピに戻る", my_recipes_path %></p>

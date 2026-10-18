@@ -1,0 +1,11 @@
+curry_rice:
+  recipe: public_one
+  name: 米
+  quantity: 2合
+  position: 0
+
+curry_roux:
+  recipe: public_one
+  name: カレールー
+  quantity: 1箱
+  position: 1
