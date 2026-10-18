@@ -27,13 +27,13 @@
         <% if item.recipe %><span class="source">(<%= item.recipe.title %>)</span><% end %>
         <%= button_to item.checked? ? "買うものに戻す" : "買った", shopping_item_path(item, checked: !item.checked?), method: :patch,
                       aria: { label: "#{item.name}を#{item.checked? ? "買うものに戻す" : "買ったものにする"}" } %>
-        <%= button_to "消す", shopping_item_path(item), method: :delete, aria: { label: "#{item.name}を消す" } %>
+        <%= button_to "消す", shopping_item_path(item), method: :delete, form_class: "button_to danger", aria: { label: "#{item.name}を消す" } %>
       </li>
     <% end %>
   </ul>
   <p class="actions">
-    <%= button_to "買ったものを消す", clear_checked_shopping_items_path, method: :delete %>
-    <%= button_to "すべて消す", clear_all_shopping_items_path, method: :delete,
+    <%= button_to "買ったものを消す", clear_checked_shopping_items_path, method: :delete, form_class: "button_to secondary" %>
+    <%= button_to "すべて消す", clear_all_shopping_items_path, method: :delete, form_class: "button_to danger",
                   form: { data: { turbo_confirm: "買い物リストをすべて消します。よろしいですか?" } } %>
   </p>
 <% end %>

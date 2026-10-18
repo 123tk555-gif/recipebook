@@ -1,5 +1,8 @@
 <% content_for :title, "レシピ一覧" %>
-<h1>みんなのレシピ</h1>
+<div class="hero">
+  <h1>みんなのレシピ</h1>
+  <p>今日の一皿を、みつけよう。</p>
+</div>
 
 <%= form_with url: recipes_path, method: :get, class: "search", role: "search" do |form| %>
   <p>

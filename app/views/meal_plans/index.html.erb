@@ -31,7 +31,7 @@
                     (見られなくなったレシピ)
                   <% end %>
                   <% if plan.servings %><span>(<%= plan.servings %>人分)</span><% end %>
-                  <%= button_to "外す", meal_plan_path(plan), method: :delete,
+                  <%= button_to "外す", meal_plan_path(plan), method: :delete, form_class: "button_to secondary",
                                 aria: { label: "#{l(date, format: "%-m/%-d")}の#{plan.slot_name}から外す" } %>
                 </div>
               <% end %>

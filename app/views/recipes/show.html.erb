@@ -20,14 +20,14 @@
   <% end %>
 
   <h2>材料</h2>
-  <ul>
+  <ul class="ingredients">
     <% @recipe.ingredients.each do |ingredient| %>
-      <li><%= ingredient.name %> <%= ingredient.quantity %></li>
+      <li><span class="name"><%= ingredient.name %></span> <span class="quantity"><%= ingredient.quantity %></span></li>
     <% end %>
   </ul>
 
   <h2>作り方</h2>
-  <ol>
+  <ol class="steps">
     <% @recipe.steps.each do |step| %>
       <li><%= step.body %></li>
     <% end %>
@@ -53,7 +53,7 @@
         <%= button_to "元に戻す", restore_trashed_recipe_path(@recipe), method: :post %>
       <% else %>
         <%= link_to "編集", edit_recipe_path(@recipe), class: "button" %>
-        <%= button_to "ゴミ箱に移す", recipe_path(@recipe), method: :delete,
+        <%= button_to "ゴミ箱に移す", recipe_path(@recipe), method: :delete, form_class: "button_to secondary",
                       form: { data: { turbo_confirm: "ゴミ箱に移します。#{Recipe::TRASH_DAYS}日以内なら元に戻せます。" } } %>
       <% end %>
     </p>
