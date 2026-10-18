@@ -1,0 +1,6 @@
+<p>
+  パスワードの再設定を受け付けました。次のページで、新しいパスワードを決めてください。<br>
+  <%= link_to "パスワードを再設定する", edit_password_url(@user.password_reset_token) %>
+</p>
+<p>このリンクの有効期限は<%= distance_of_time_in_words(0, @user.password_reset_token_expires_in) %>です。</p>
+<p>心当たりがない場合は、このメールを無視してください。</p>

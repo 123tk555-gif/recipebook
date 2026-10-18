@@ -1,0 +1,10 @@
+<% if record.errors.any? %>
+  <div class="errors" role="alert">
+    <p>エラー: 入力内容を確認してください(<%= record.errors.count %>件)</p>
+    <ul>
+      <% record.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

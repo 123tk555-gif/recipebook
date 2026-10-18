@@ -1,0 +1,9 @@
+<% content_for :title, "レシピ一覧" %>
+<h1>みんなのレシピ</h1>
+<% if @recipes.empty? %>
+  <p>まだレシピがありません。<%= link_to "最初のレシピを書く", new_recipe_path %></p>
+<% else %>
+  <div class="cards">
+    <%= render partial: "recipes/card", collection: @recipes, as: :recipe %>
+  </div>
+<% end %>

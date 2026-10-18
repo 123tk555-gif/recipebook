@@ -1,0 +1,15 @@
+<article class="card">
+  <% if recipe.photo.attached? %>
+    <%= image_tag recipe.photo.variant(:thumb), alt: "#{recipe.title}の写真", loading: "lazy" %>
+  <% end %>
+  <h2><%= link_to recipe.title, recipe %></h2>
+  <p class="meta">
+    <%= recipe.user.display_name %> さん
+    <% if recipe.cooking_minutes %>/ <%= recipe.cooking_minutes %>分<% end %>
+    <% if recipe.servings %>/ <%= recipe.servings %>人分<% end %>
+    <% unless recipe.published? %>/ <strong class="badge">非公開</strong><% end %>
+  </p>
+  <% if recipe.tags.any? %>
+    <p class="tags"><% recipe.tags.each do |tag| %><span class="tag">#<%= tag.name %></span> <% end %></p>
+  <% end %>
+</article>

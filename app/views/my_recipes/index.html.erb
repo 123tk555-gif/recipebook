@@ -1,0 +1,10 @@
+<% content_for :title, "マイレシピ" %>
+<h1>マイレシピ</h1>
+<p><%= link_to "ゴミ箱(#{@trashed_count}件)", trashed_recipes_path %></p>
+<% if @recipes.empty? %>
+  <p>まだレシピがありません。<%= link_to "レシピを書く", new_recipe_path %></p>
+<% else %>
+  <div class="cards">
+    <%= render partial: "recipes/card", collection: @recipes, as: :recipe %>
+  </div>
+<% end %>

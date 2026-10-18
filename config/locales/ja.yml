@@ -1,0 +1,31 @@
+ja:
+  activerecord:
+    models:
+      user: 会員
+      recipe: レシピ
+      ingredient: 材料
+      step: 手順
+      tag: タグ
+    attributes:
+      user:
+        email_address: メールアドレス
+        display_name: 表示名
+        password: パスワード
+        password_confirmation: パスワード(確認)
+      recipe:
+        title: 料理名
+        description: 説明
+        cooking_minutes: 調理時間
+        servings: 人数
+        published: 公開
+        photo: 写真
+        tag_list: タグ
+        ingredients: 材料
+        steps: 手順
+      ingredient:
+        name: 材料名
+        quantity: 分量
+      step:
+        body: 手順の内容
+      tag:
+        name: タグ名

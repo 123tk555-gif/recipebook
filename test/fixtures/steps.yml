@@ -1,0 +1,9 @@
+curry_step_one:
+  recipe: public_one
+  body: 野菜を切る
+  position: 0
+
+curry_step_two:
+  recipe: public_one
+  body: 煮込む
+  position: 1

@@ -1,0 +1,23 @@
+<% content_for :title, "会員登録" %>
+<h1>会員登録</h1>
+<%= form_with model: @user, url: registration_path do |form| %>
+  <%= render "shared/errors", record: @user %>
+  <p>
+    <%= form.label :display_name, "表示名(30文字まで)" %>
+    <%= form.text_field :display_name, required: true, maxlength: 30, autofocus: true %>
+  </p>
+  <p>
+    <%= form.label :email_address, "メールアドレス" %>
+    <%= form.email_field :email_address, required: true, autocomplete: "username" %>
+  </p>
+  <p>
+    <%= form.label :password, "パスワード(8文字以上)" %>
+    <%= form.password_field :password, required: true, minlength: 8, maxlength: 72, autocomplete: "new-password" %>
+  </p>
+  <p>
+    <%= form.label :password_confirmation, "パスワード(確認)" %>
+    <%= form.password_field :password_confirmation, required: true, minlength: 8, maxlength: 72, autocomplete: "new-password" %>
+  </p>
+  <p><%= form.submit "登録する" %></p>
+<% end %>
+<p>登録済みの方は <%= link_to "ログイン", new_session_path %></p>

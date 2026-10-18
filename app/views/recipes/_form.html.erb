@@ -1,0 +1,69 @@
+<%= form_with model: recipe do |form| %>
+  <%= render "shared/errors", record: recipe %>
+
+  <p>
+    <%= form.label :title, "料理名(必須・100文字まで)" %>
+    <%= form.text_field :title, required: true, maxlength: 100, autofocus: true %>
+  </p>
+  <p>
+    <%= form.label :description, "説明(2000文字まで)" %>
+    <%= form.text_area :description, rows: 4, maxlength: 2000 %>
+  </p>
+  <p>
+    <%= form.label :cooking_minutes, "調理時間(分)" %>
+    <%= form.number_field :cooking_minutes, min: 1, max: 1440 %>
+  </p>
+  <p>
+    <%= form.label :servings, "何人分" %>
+    <%= form.number_field :servings, min: 1, max: 100 %>
+  </p>
+  <p>
+    <%= form.label :tag_list, "タグ(カンマか空白で区切る・10個まで)" %>
+    <%= form.text_field :tag_list %>
+  </p>
+
+  <fieldset>
+    <legend>材料</legend>
+    <%= form.fields_for :ingredients do |f| %>
+      <div class="row">
+        <%= f.label :name, "材料名" %>
+        <%= f.text_field :name, maxlength: 50 %>
+        <%= f.label :quantity, "分量" %>
+        <%= f.text_field :quantity, maxlength: 30 %>
+        <%= f.hidden_field :position, value: f.index %>
+        <% if f.object.persisted? %>
+          <%= f.check_box :_destroy %><%= f.label :_destroy, "削除する" %>
+        <% end %>
+      </div>
+    <% end %>
+  </fieldset>
+
+  <fieldset>
+    <legend>作り方</legend>
+    <%= form.fields_for :steps do |f| %>
+      <div class="row">
+        <%= f.label :body, "手順#{f.index + 1}" %>
+        <%= f.text_area :body, rows: 2, maxlength: 1000 %>
+        <%= f.hidden_field :position, value: f.index %>
+        <% if f.object.persisted? %>
+          <%= f.check_box :_destroy %><%= f.label :_destroy, "削除する" %>
+        <% end %>
+      </div>
+    <% end %>
+  </fieldset>
+
+  <p>
+    <%= form.label :photo, "写真(JPEG・PNG・WebP、5MBまで)" %>
+    <%= form.file_field :photo, accept: Recipe::PHOTO_TYPES.join(",") %>
+  </p>
+  <% if recipe.persisted? && recipe.photo.attached? %>
+    <p><%= form.check_box :remove_photo %><%= form.label :remove_photo, "今の写真を削除する" %></p>
+  <% end %>
+
+  <p>
+    <%= form.check_box :published %>
+    <%= form.label :published, "公開する(チェックしないと自分だけが見られます)" %>
+  </p>
+
+  <p><%= form.submit recipe.persisted? ? "更新する" : "登録する" %></p>
+<% end %>
