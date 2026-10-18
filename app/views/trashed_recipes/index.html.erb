@@ -4,7 +4,7 @@
 <% if @recipes.empty? %>
   <p>ゴミ箱は空です。</p>
 <% else %>
-  <%= button_to "ゴミ箱を空にする", empty_trashed_recipes_path, method: :delete,
+  <%= button_to "ゴミ箱を空にする", empty_trashed_recipes_path, method: :delete, form_class: "button_to danger",
                 form: { data: { turbo_confirm: "ゴミ箱のレシピをすべて完全に削除します。元に戻せません。" } } %>
   <ul class="trash">
     <% @recipes.each do |recipe| %>
@@ -12,7 +12,7 @@
         <%= link_to recipe.title, recipe %>
         (あと<%= recipe.days_until_purge %>日で完全に削除)
         <%= button_to "元に戻す", restore_trashed_recipe_path(recipe), method: :post %>
-        <%= button_to "完全に削除", trashed_recipe_path(recipe), method: :delete,
+        <%= button_to "完全に削除", trashed_recipe_path(recipe), method: :delete, form_class: "button_to danger",
                       form: { data: { turbo_confirm: "「#{recipe.title}」を完全に削除します。元に戻せません。" } } %>
       </li>
     <% end %>

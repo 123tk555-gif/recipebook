@@ -10,27 +10,42 @@
     <% if @recipe.servings %>/ <%= @recipe.servings %>人分<% end %>
     / <strong class="badge"><%= @recipe.published? ? "公開" : "非公開" %></strong>
   </p>
+  <% unless @recipe.trashed? %><%= render "recipes/favorite_button", recipe: @recipe %><% end %>
   <% if @recipe.photo.attached? %>
     <%= image_tag @recipe.photo.variant(:medium), alt: "#{@recipe.title}の写真", class: "photo" %>
   <% end %>
-  <% if @recipe.description.present? %><p><%= simple_format(h(@recipe.description)) %></p><% end %>
+  <% if @recipe.description.present? %><%= simple_format(h(@recipe.description)) %><% end %>
   <% if @recipe.tags.any? %>
-    <p class="tags"><% @recipe.tags.each do |tag| %><span class="tag">#<%= tag.name %></span> <% end %></p>
+    <p class="tags"><% @recipe.tags.each do |tag| %><%= link_to "##{tag.name}", recipes_path(tag: tag.name), class: "tag" %> <% end %></p>
   <% end %>
 
   <h2>材料</h2>
-  <ul>
+  <ul class="ingredients">
     <% @recipe.ingredients.each do |ingredient| %>
-      <li><%= ingredient.name %> <%= ingredient.quantity %></li>
+      <li><span class="name"><%= ingredient.name %></span> <span class="quantity"><%= ingredient.quantity %></span></li>
     <% end %>
   </ul>
 
   <h2>作り方</h2>
-  <ol>
+  <ol class="steps">
     <% @recipe.steps.each do |step| %>
       <li><%= step.body %></li>
     <% end %>
   </ol>
+
+  <% if authenticated? && !@recipe.trashed? %>
+    <section class="use-recipe" aria-labelledby="use-recipe-heading">
+      <h2 id="use-recipe-heading">このレシピを使う</h2>
+      <%= form_with url: recipe_shopping_items_path(@recipe), class: "inline-form" do |form| %>
+        <p>
+          <%= form.label :servings, @recipe.servings ? "何人分の材料を買うか(このレシピは#{@recipe.servings}人分)" : "何人分(このレシピは人数が書かれていないので、分量はそのままです)" %>
+          <%= form.number_field :servings, min: 1, max: 100, value: @recipe.servings, disabled: @recipe.servings.nil? %>
+        </p>
+        <p><%= form.submit "材料を買い物リストに追加" %></p>
+      <% end %>
+      <%= render "meal_plans/form", recipes: [], default_date: Date.current, selected_recipe: @recipe %>
+    </section>
+  <% end %>
 
   <% if @recipe.editable_by?(current_user) %>
     <p class="actions">
@@ -38,7 +53,7 @@
         <%= button_to "元に戻す", restore_trashed_recipe_path(@recipe), method: :post %>
       <% else %>
         <%= link_to "編集", edit_recipe_path(@recipe), class: "button" %>
-        <%= button_to "ゴミ箱に移す", recipe_path(@recipe), method: :delete,
+        <%= button_to "ゴミ箱に移す", recipe_path(@recipe), method: :delete, form_class: "button_to secondary",
                       form: { data: { turbo_confirm: "ゴミ箱に移します。#{Recipe::TRASH_DAYS}日以内なら元に戻せます。" } } %>
       <% end %>
     </p>

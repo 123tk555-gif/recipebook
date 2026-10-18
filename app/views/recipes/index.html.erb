@@ -1,9 +1,60 @@
 <% content_for :title, "レシピ一覧" %>
-<h1>みんなのレシピ</h1>
+<div class="hero">
+  <h1>みんなのレシピ</h1>
+  <p>今日の一皿を、みつけよう。</p>
+</div>
+
+<%= form_with url: recipes_path, method: :get, class: "search", role: "search" do |form| %>
+  <p>
+    <%= form.label :q, "キーワード(料理名・材料・タグ。空白で区切るとすべてを含むもの)" %>
+    <%= form.search_field :q, value: @search.q, maxlength: 100 %>
+  </p>
+  <div class="search-options">
+    <p>
+      <%= form.label :max_minutes, "調理時間" %>
+      <%= form.select :max_minutes, RecipeSearch::MINUTES.map { |m| [ "#{m}分以内", m ] },
+                      { include_blank: "指定なし", selected: @search.max_minutes } %>
+    </p>
+    <p>
+      <%= form.label :sort, "並び順" %>
+      <%= form.select :sort, RecipeSearch::SORTS.invert, selected: @search.sort %>
+    </p>
+  </div>
+  <%= form.hidden_field :tag, value: @search.tag if @search.tag.present? %>
+  <p><%= form.submit "検索する", name: nil %></p>
+<% end %>
+
+<% if @search.tag.present? %>
+  <p>タグ「#<%= @search.tag %>」で絞り込み中 <%= link_to "(タグの絞り込みを外す)", recipes_path(q: @search.q, max_minutes: @search.max_minutes, sort: @search.sort) %></p>
+<% end %>
+
+<% if @popular_tags.any? %>
+  <nav aria-label="よく使われるタグ" class="tags">
+    よく使われるタグ:
+    <% @popular_tags.each do |tag| %>
+      <%= link_to "##{tag.name}", recipes_path(tag: tag.name), class: "tag" %>
+    <% end %>
+    <%= link_to "すべてのタグ", tags_path %>
+  </nav>
+<% end %>
+
 <% if @recipes.empty? %>
-  <p>まだレシピがありません。<%= link_to "最初のレシピを書く", new_recipe_path %></p>
+  <% if @search.filtered? %>
+    <p>条件に合うレシピは見つかりませんでした。キーワードや条件を変えてみてください。</p>
+  <% else %>
+    <p>まだレシピがありません。<%= link_to "最初のレシピを書く", new_recipe_path %></p>
+  <% end %>
 <% else %>
   <div class="cards">
     <%= render partial: "recipes/card", collection: @recipes, as: :recipe %>
   </div>
+  <nav aria-label="ページ" class="pager">
+    <% if @search.prev_page? %>
+      <%= link_to "← 前のページ", recipes_path(request.query_parameters.merge(page: @search.page - 1)), rel: "prev" %>
+    <% end %>
+    <span><%= @search.page %>ページ目</span>
+    <% if @search.next_page? %>
+      <%= link_to "次のページ →", recipes_path(request.query_parameters.merge(page: @search.page + 1)), rel: "next" %>
+    <% end %>
+  </nav>
 <% end %>

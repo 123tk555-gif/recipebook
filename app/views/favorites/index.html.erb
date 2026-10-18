@@ -1,0 +1,9 @@
+<% content_for :title, "お気に入り" %>
+<h1>お気に入り</h1>
+<% if @recipes.empty? %>
+  <p>お気に入りはまだありません。レシピの「☆ お気に入りに追加」から登録できます。</p>
+<% else %>
+  <div class="cards">
+    <%= render partial: "recipes/card", collection: @recipes, as: :recipe %>
+  </div>
+<% end %>

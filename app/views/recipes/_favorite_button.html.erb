@@ -1,0 +1,12 @@
+<div id="<%= dom_id(recipe, :favorite) %>" class="favorite">
+  <% if authenticated? %>
+    <% if current_user.favorited?(recipe) %>
+      <%= button_to "★ お気に入りから外す", recipe_favorite_path(recipe), method: :delete, aria: { pressed: true } %>
+    <% else %>
+      <%= button_to "☆ お気に入りに追加", recipe_favorite_path(recipe), method: :post, aria: { pressed: false } %>
+    <% end %>
+  <% else %>
+    <%= link_to "ログインしてお気に入りに追加", new_session_path %>
+  <% end %>
+  <span>お気に入り <%= recipe.favorites_count %>人</span>
+</div>

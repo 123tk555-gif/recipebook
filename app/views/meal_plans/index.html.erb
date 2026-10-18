@@ -1,0 +1,55 @@
+<% content_for :title, "献立" %>
+<h1>献立(<%= l(@start, format: :long) %>〜<%= l(@start + 6.days, format: :long) %>)</h1>
+
+<nav aria-label="週の切り替え" class="pager">
+  <%= link_to "← 前の週", meal_plans_path(week: @start - 7.days) %>
+  <%= link_to "今週", meal_plans_path %>
+  <%= link_to "次の週 →", meal_plans_path(week: @start + 7.days) %>
+</nav>
+
+<div class="table-wrap">
+  <table class="meal-plan">
+    <caption>1週間の献立</caption>
+    <thead>
+      <tr>
+        <th scope="col">日付</th>
+        <% MealPlan::SLOT_NAMES.each_value do |name| %><th scope="col"><%= name %></th><% end %>
+      </tr>
+    </thead>
+    <tbody>
+      <% 7.times do |i| %>
+        <% date = @start + i.days %>
+        <tr class="<%= "today" if date == Date.current %>">
+          <th scope="row"><%= l(date, format: "%-m/%-d(%a)") %><%= " 今日" if date == Date.current %></th>
+          <% MealPlan.slots.each_key do |slot| %>
+            <td>
+              <% Array(@plans[[ date, slot ]]).each do |plan| %>
+                <div class="plan">
+                  <% if plan.recipe.viewable_by?(current_user) && !plan.recipe.trashed? %>
+                    <%= link_to plan.recipe.title, plan.recipe %>
+                  <% else %>
+                    (見られなくなったレシピ)
+                  <% end %>
+                  <% if plan.servings %><span>(<%= plan.servings %>人分)</span><% end %>
+                  <%= button_to "外す", meal_plan_path(plan), method: :delete, form_class: "button_to secondary",
+                                aria: { label: "#{l(date, format: "%-m/%-d")}の#{plan.slot_name}から外す" } %>
+                </div>
+              <% end %>
+            </td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if @plans.any? %>
+  <%= button_to "この週の材料を買い物リストに追加", add_to_shopping_list_meal_plans_path(week: @start), method: :post %>
+<% end %>
+
+<h2>献立に追加</h2>
+<% if @candidate_recipes.empty? %>
+  <p>献立に入れられるのは、自分のレシピとお気に入りのレシピです。まだありません。</p>
+<% else %>
+  <%= render "meal_plans/form", recipes: @candidate_recipes, default_date: [ @start, Date.current ].max, selected_recipe: nil %>
+<% end %>
