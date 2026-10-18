@@ -24,14 +24,17 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 
+  # HTTPS は手前の Caddy が受け持つ。公開の前に HTTP だけで動作確認するときは FORCE_SSL=false にする
+  https = ENV.fetch("FORCE_SSL", "true") == "true"
+
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
-  config.assume_ssl = true
+  config.assume_ssl = https
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  config.force_ssl = https
 
   # Skip http-to-https redirect for the default health check endpoint.
-  # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
+  config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
   # Log to STDOUT with the current request id as a default log tag.
   config.log_tags = [ :request_id ]
@@ -53,21 +56,28 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  # メールの中のリンク(パスワード再設定)に使うアドレス。APP_HOST は公開するドメイン(例: 52-194-241-136.sslip.io)
+  config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "localhost"), protocol: https ? "https" : "http" }
 
-  # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
-
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # メールの送信(本番は Amazon SES の SMTP)。SMTP_ADDRESS が無いときは送らずにログにだけ残す
+  if ENV["SMTP_ADDRESS"].present?
+    config.action_mailer.delivery_method = :smtp
+    # 送れなかったときはジョブを失敗させて、Solid Queue に記録を残す
+    config.action_mailer.raise_delivery_errors = true
+    config.action_mailer.smtp_settings = {
+      address: ENV["SMTP_ADDRESS"],
+      port: ENV.fetch("SMTP_PORT", 587).to_i,
+      user_name: ENV["SMTP_USERNAME"].presence,
+      password: ENV["SMTP_PASSWORD"].presence,
+      authentication: (ENV["SMTP_USERNAME"].present? ? :login : nil),
+      enable_starttls_auto: ENV.fetch("SMTP_STARTTLS", "true") == "true",
+      open_timeout: 10,
+      read_timeout: 10
+    }.compact
+  else
+    config.action_mailer.delivery_method = :test
+    config.after_initialize { Rails.logger.warn("SMTP_ADDRESS が未設定のため、メールは送信されません") }
+  end
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
@@ -79,12 +89,9 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
-  # Enable DNS rebinding protection and other `Host` header attacks.
-  # config.hosts = [
-  #   "example.com",     # Allow requests from example.com
-  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
-  # ]
-  #
+  # 公開するドメイン以外の Host ヘッダーは受け付けない(DNS リバインディングなどの対策)
+  config.hosts = ENV.fetch("APP_HOST", "localhost").split(",").map(&:strip)
+
   # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end

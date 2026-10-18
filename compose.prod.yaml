@@ -1,0 +1,105 @@
+# 公開用。データベース(MySQL)・アプリ(Rails)・入口(Caddy)を、1台のサーバー(メモリ 1GB)で動かす。
+# 使い方: このフォルダに .env を作り(.env.example を参考に)、次を実行する
+#   docker compose -f compose.prod.yaml up -d --build
+# ふだんの開発用の compose.yaml とは別物(データの保存場所も別)。
+name: recipebook-prod
+
+services:
+  db:
+    image: mysql:9.7
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?.env に DB_ROOT_PASSWORD を設定してください}
+      MYSQL_USER: recipebook
+      MYSQL_PASSWORD: ${DB_PASSWORD:?.env に DB_PASSWORD を設定してください}
+      TZ: Asia/Tokyo
+    # メモリ 1GB のサーバー向けに、MySQL が使うメモリを抑える(初期設定のままだと 500MB ほど使う)。
+    # 設定ファイルではなく起動時の指定で渡す(Windows のフォルダから渡した設定ファイルは、
+    # 「誰でも書き換えられる」扱いになり、MySQL が安全のために無視するため)
+    command:
+      - mysqld
+      - --innodb-buffer-pool-size=64M
+      - --innodb-log-buffer-size=8M
+      - --innodb-redo-log-capacity=64M
+      - --performance-schema=OFF
+      - --max-connections=40
+      - --table-open-cache=400
+      - --table-definition-cache=400
+      - --thread-cache-size=8
+      - --tmp-table-size=16M
+      - --max-heap-table-size=16M
+      - --sort-buffer-size=512K
+      - --join-buffer-size=512K
+      - --key-buffer-size=8M
+      - --skip-name-resolve
+    # データベースは外に公開しない(アプリのコンテナからだけ接続する)
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./deploy/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
+  app:
+    build: .
+    image: recipebook-app
+    environment:
+      DB_HOST: db
+      DB_USERNAME: recipebook
+      DB_PASSWORD: ${DB_PASSWORD}
+      # Rails の秘密鍵。サーバーの中でランダムに作る(config/master.key は使わない)
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:?.env に SECRET_KEY_BASE を設定してください}
+      APP_HOST: ${APP_HOST:-localhost}
+      FORCE_SSL: ${FORCE_SSL:-true}
+      # メール(Amazon SES)。未設定ならメールは送らない
+      SMTP_ADDRESS: ${SMTP_ADDRESS:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-true}
+      MAIL_FROM: ${MAIL_FROM:-}
+      # 1GB のサーバー向け: Puma は1プロセス(0 = 子プロセスを作らない)・3スレッド、ジョブ(Solid Queue)も Puma の中のスレッドで動かす
+      WEB_CONCURRENCY: 0
+      RAILS_MAX_THREADS: 3
+      SOLID_QUEUE_IN_PUMA: "true"
+      SOLID_QUEUE_MODE: ${SOLID_QUEUE_MODE:-async}
+      MALLOC_ARENA_MAX: 2
+      RAILS_LOG_LEVEL: ${RAILS_LOG_LEVEL:-info}
+      TZ: Asia/Tokyo
+    volumes:
+      # 画像(Active Storage)。バックアップの対象
+      - storage:/rails/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/up > /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped
+
+  # 公開の入口。HTTPS(証明書は自動で取得)を受けて、アプリへ中継する。
+  # SITE_ADDRESS に公開のドメインを書くと HTTPS になる。省略すると、HTTP の 80 番だけで動く。
+  caddy:
+    image: caddy:2
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "443:443"
+    volumes:
+      - ./deploy/aws/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    depends_on:
+      app:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  db-data:
+  storage:
+  caddy-data:

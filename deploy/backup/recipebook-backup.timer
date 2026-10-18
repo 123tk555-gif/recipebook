@@ -1,0 +1,15 @@
+# 毎日 午前3時30分(日本時間)にバックアップする。サーバーが止まっていて逃した分は、次に起動したときに実行する
+# 置き場所: /etc/systemd/system/recipebook-backup.timer
+#   有効にする: systemctl daemon-reload && systemctl enable --now recipebook-backup.timer
+#   次の予定:   systemctl list-timers recipebook-backup.timer
+#   結果:       journalctl -u recipebook-backup.service
+[Unit]
+Description=recipebook の毎日のバックアップ
+
+[Timer]
+OnCalendar=*-*-* 03:30:00 Asia/Tokyo
+Persistent=true
+RandomizedDelaySec=5min
+
+[Install]
+WantedBy=timers.target

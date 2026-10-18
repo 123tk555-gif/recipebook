@@ -1,0 +1,10 @@
+# バックアップを1回実行する(recipebook-backup.timer から呼ばれる)
+# 置き場所: /etc/systemd/system/recipebook-backup.service
+[Unit]
+Description=recipebook のデータベースと画像のバックアップ
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/recipebook/deploy/backup/backup.sh
