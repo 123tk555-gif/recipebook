@@ -1,0 +1,44 @@
+# 開発用(ふだんの開発とテスト)。本番用は compose.prod.yaml(あとで作る)。
+# 使い方: docker compose up -d       … アプリ(http://localhost:3000)とデータベースを起動
+#         docker compose run --rm web bin/rails test   … テスト
+services:
+  db:
+    image: mysql:9.7
+    container_name: recipebook-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      TZ: Asia/Tokyo
+    # このPCからだけ接続できる(ログイン情報が開発用の値のため)
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - recipebook-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -ppassword --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: recipebook-web
+    command: bash -c "rm -f tmp/pids/server.pid && bundle install && bin/rails db:prepare && bin/rails server -b 0.0.0.0"
+    environment:
+      DB_HOST: db
+      DB_PASSWORD: password
+      RAILS_ENV: development
+      TZ: Asia/Tokyo
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - .:/rails
+      - recipebook-bundle:/usr/local/bundle
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  recipebook-db-data:
+  recipebook-bundle:
