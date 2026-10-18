@@ -35,3 +35,13 @@ docker compose exec web bin/rails console     # Rails のコンソール
 
 - `config/master.key` は git に入れていません。本番の公開に必要なので、なくさないよう保管してください。
 - テストは並列実行していません(Ruby 4.0.7 + trilogy ではスレッド並列にすると接続が衝突するため)。
+
+## 管理者
+
+管理画面(`/admin`)は管理者だけが開けます(それ以外の人には 404)。管理者は次のコマンドで決めます。
+
+```sh
+docker compose exec web bin/rails "admin:grant[メールアドレス]"   # 管理者にする
+docker compose exec web bin/rails "admin:revoke[メールアドレス]"  # 管理者から外す(最後の1人は外せない)
+docker compose exec web bin/rails admin:list                     # 管理者の一覧
+```

@@ -4,7 +4,8 @@ class Recipe < ApplicationRecord
   PHOTO_TYPES = %w[image/jpeg image/png image/webp].freeze
   PHOTO_MAX_BYTES = 5.megabytes
 
-  belongs_to :user
+  # 作者が退会して、公開レシピを残したときは空になる
+  belongs_to :user, optional: true
   has_many :ingredients, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :recipe
   has_many :steps, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :recipe
   has_many :recipe_tags, dependent: :destroy
@@ -14,6 +15,7 @@ class Recipe < ApplicationRecord
   has_many :meal_plans, dependent: :delete_all
   # 買い物リストの項目は残す(どのレシピからかの記録だけを外す)
   has_many :shopping_items, dependent: :nullify
+  has_many :reports, dependent: :destroy
 
   has_one_attached :photo do |attachable|
     attachable.variant :medium, resize_to_limit: [ 1200, 1200 ]
@@ -25,6 +27,7 @@ class Recipe < ApplicationRecord
   accepts_nested_attributes_for :steps, allow_destroy: true,
                                 reject_if: ->(attrs) { attrs["body"].blank? }
 
+  validates :user, presence: true, on: :create
   validates :title, presence: true, length: { maximum: 100 }
   validates :description, length: { maximum: 2000 }
   validates :cooking_minutes, numericality: { only_integer: true, in: 1..1440 }, allow_nil: true
@@ -36,7 +39,8 @@ class Recipe < ApplicationRecord
 
   scope :active, -> { where(deleted_at: nil) }
   scope :trashed, -> { where.not(deleted_at: nil) }
-  scope :publicly_visible, -> { active.where(published: true) }
+  # 誰でも見られるレシピ: ゴミ箱でなく、持ち主が公開にしていて、管理者が非公開にしていないもの
+  scope :publicly_visible, -> { active.where(published: true, hidden_at: nil) }
   scope :newest_first, -> { order(created_at: :desc, id: :desc) }
 
   # ゴミ箱に入れてから TRASH_DAYS 日を過ぎたレシピ
@@ -46,7 +50,7 @@ class Recipe < ApplicationRecord
   def self.visible_to(user)
     return publicly_visible unless user
 
-    active.where(published: true).or(active.where(user_id: user.id))
+    publicly_visible.or(active.where(user_id: user.id))
   end
 
   def self.purge_expired
@@ -71,13 +75,39 @@ class Recipe < ApplicationRecord
     [ ((deleted_at + TRASH_DAYS.days - Time.current) / 1.day).ceil, 0 ].max
   end
 
+  def publicly_visible?
+    !trashed? && published? && !hidden?
+  end
+
+  def owned_by?(user)
+    user.present? && user_id.present? && user.id == user_id
+  end
+
+  # 見られる人: 誰でも(公開中のとき)・持ち主(非公開やゴミ箱でも)
+  # 管理者は、これとは別に RecipesController#show で見られるようにしている
   def viewable_by?(user)
-    return false if trashed? && user&.id != user_id
-    published? || user&.id == user_id
+    publicly_visible? || owned_by?(user)
   end
 
   def editable_by?(user)
-    user.present? && user.id == user_id
+    owned_by?(user)
+  end
+
+  # 管理者による非公開
+  def hidden?
+    hidden_at.present?
+  end
+
+  def hide!
+    update!(hidden_at: Time.current)
+  end
+
+  def unhide!
+    update!(hidden_at: nil)
+  end
+
+  def author_name
+    user&.display_name || "退会した会員"
   end
 
   # フォーム用: 写真の削除チェックボックス

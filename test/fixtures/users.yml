@@ -15,3 +15,9 @@ suspended:
   password_digest: <%= password_digest %>
   display_name: 停止中
   suspended: true
+
+admin:
+  email_address: admin@example.com
+  password_digest: <%= password_digest %>
+  display_name: 管理人
+  admin: true

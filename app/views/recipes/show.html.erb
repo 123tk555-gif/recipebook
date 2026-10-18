@@ -1,16 +1,28 @@
 <% content_for :title, @recipe.title %>
+<% if @recipe.publicly_visible? %>
+  <% content_for :ogp do %>
+    <%= render "recipes/ogp", recipe: @recipe %>
+  <% end %>
+<% end %>
+
 <% if @recipe.trashed? %>
   <p class="flash alert" role="status">注意: このレシピはゴミ箱に入っています(あと<%= @recipe.days_until_purge %>日で完全に削除されます)。</p>
 <% end %>
+<% if @recipe.hidden? && (@recipe.owned_by?(current_user) || current_user&.admin?) %>
+  <p class="flash alert" role="status">注意: このレシピは、通報などにより管理者が非公開にしています。持ち主と管理者だけが見られます。</p>
+<% end %>
+
 <article class="recipe">
   <h1><%= @recipe.title %></h1>
   <p class="meta">
-    <%= @recipe.user.display_name %> さん
+    <%= @recipe.author_name %><%= " さん" if @recipe.user %>
     <% if @recipe.cooking_minutes %>/ 調理時間 <%= @recipe.cooking_minutes %>分<% end %>
     <% if @recipe.servings %>/ <%= @recipe.servings %>人分<% end %>
-    / <strong class="badge"><%= @recipe.published? ? "公開" : "非公開" %></strong>
+    / <strong class="badge"><%= @recipe.publicly_visible? ? "公開" : "非公開" %></strong>
   </p>
-  <% unless @recipe.trashed? %><%= render "recipes/favorite_button", recipe: @recipe %><% end %>
+  <% if @recipe.viewable_by?(current_user) && !@recipe.trashed? %>
+    <%= render "recipes/favorite_button", recipe: @recipe %>
+  <% end %>
   <% if @recipe.photo.attached? %>
     <%= image_tag @recipe.photo.variant(:medium), alt: "#{@recipe.title}の写真", class: "photo" %>
   <% end %>
@@ -33,7 +45,11 @@
     <% end %>
   </ol>
 
-  <% if authenticated? && !@recipe.trashed? %>
+  <% if @recipe.publicly_visible? %>
+    <%= render "recipes/share", recipe: @recipe %>
+  <% end %>
+
+  <% if authenticated? && @recipe.viewable_by?(current_user) && !@recipe.trashed? %>
     <section class="use-recipe" aria-labelledby="use-recipe-heading">
       <h2 id="use-recipe-heading">このレシピを使う</h2>
       <%= form_with url: recipe_shopping_items_path(@recipe), class: "inline-form" do |form| %>
@@ -58,5 +74,23 @@
       <% end %>
     </p>
   <% end %>
+
+  <% if current_user&.admin? %>
+    <section class="admin-box" aria-labelledby="admin-heading">
+      <h2 id="admin-heading">管理者の操作</h2>
+      <% if @recipe.hidden? %>
+        <%= button_to "非公開を解除する", unhide_admin_recipe_path(@recipe), method: :post %>
+      <% else %>
+        <%= button_to "管理者として非公開にする", hide_admin_recipe_path(@recipe), method: :post, form_class: "button_to danger",
+                      form: { data: { turbo_confirm: "このレシピを非公開にします。持ち主と管理者だけが見られるようになります。" } } %>
+      <% end %>
+    </section>
+  <% end %>
 </article>
-<p><%= link_to "レシピ一覧に戻る", root_path %></p>
+
+<p class="after-recipe">
+  <%= link_to "レシピ一覧に戻る", root_path %>
+  <% if authenticated? && @recipe.publicly_visible? && !@recipe.owned_by?(current_user) %>
+    <%= link_to "このレシピを通報する", new_recipe_report_path(@recipe), class: "report-link" %>
+  <% end %>
+</p>

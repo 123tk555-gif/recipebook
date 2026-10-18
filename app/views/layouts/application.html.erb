@@ -10,6 +10,18 @@
     <%= csp_meta_tag %>
 
     <%= yield :head %>
+    <% if content_for?(:ogp) %>
+      <%= yield :ogp %>
+    <% else %>
+      <meta name="description" content="レシピを登録・検索・共有できるサイトです。お気に入り、買い物リスト、献立にも使えます。">
+      <meta property="og:site_name" content="レシピ管理">
+      <meta property="og:type" content="website">
+      <meta property="og:title" content="<%= content_for(:title) || "レシピ管理" %>">
+      <meta property="og:description" content="レシピを登録・検索・共有できるサイトです。">
+      <meta property="og:url" content="<%= request.base_url + request.path %>">
+      <meta property="og:locale" content="ja_JP">
+      <meta name="twitter:card" content="summary">
+    <% end %>
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -32,6 +44,8 @@
           <%= link_to "買い物リスト", shopping_items_path %>
           <%= link_to "献立", meal_plans_path %>
           <%= link_to "ゴミ箱", trashed_recipes_path %>
+          <%= link_to "アカウント設定", account_path %>
+          <% if current_user.admin? %><%= link_to "管理画面", admin_reports_path, class: "admin-link" %><% end %>
           <span class="who"><%= current_user.display_name %> さん</span>
           <%= button_to "ログアウト", session_path, method: :delete, class: "link-button" %>
         <% else %>

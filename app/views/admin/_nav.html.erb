@@ -1,0 +1,5 @@
+<nav aria-label="管理画面のメニュー" class="admin-nav">
+  <strong>管理画面:</strong>
+  <%= link_to "通報", admin_reports_path, aria: { current: (controller_name == "reports" ? "page" : nil) } %>
+  <%= link_to "会員", admin_users_path, aria: { current: (controller_name == "users" ? "page" : nil) } %>
+</nav>

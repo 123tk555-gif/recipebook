@@ -11,7 +11,8 @@ class RecipesController < ApplicationController
 
   def show
     @recipe = Recipe.includes(:ingredients, :steps, :tags, :user).find(params[:id])
-    raise ActiveRecord::RecordNotFound unless @recipe.viewable_by?(current_user)
+    # 管理者は、通報の確認のために非公開のレシピも見られる
+    raise ActiveRecord::RecordNotFound unless @recipe.viewable_by?(current_user) || current_user&.admin?
   end
 
   def new

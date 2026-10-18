@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_042134) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_062724) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -83,7 +83,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_042134) do
   end
 
   create_table "recipes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.bigint "user_id", null: false
+    t.bigint "user_id"
     t.string "title", null: false
     t.text "description"
     t.integer "cooking_minutes"
@@ -93,10 +93,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_042134) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "favorites_count", default: 0, null: false
+    t.datetime "hidden_at"
     t.index ["cooking_minutes"], name: "index_recipes_on_cooking_minutes"
     t.index ["favorites_count"], name: "index_recipes_on_favorites_count"
     t.index ["published", "deleted_at", "created_at"], name: "index_recipes_on_published_and_deleted_at_and_created_at"
     t.index ["user_id"], name: "index_recipes_on_user_id"
+  end
+
+  create_table "reports", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "recipe_id", null: false
+    t.bigint "reporter_id"
+    t.bigint "handled_by_id"
+    t.integer "reason", null: false
+    t.text "detail"
+    t.integer "status", default: 0, null: false
+    t.datetime "handled_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["handled_by_id"], name: "index_reports_on_handled_by_id"
+    t.index ["recipe_id"], name: "index_reports_on_recipe_id"
+    t.index ["reporter_id"], name: "index_reports_on_reporter_id"
+    t.index ["status", "created_at"], name: "index_reports_on_status_and_created_at"
   end
 
   create_table "sessions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -157,6 +174,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_042134) do
   add_foreign_key "recipe_tags", "recipes"
   add_foreign_key "recipe_tags", "tags"
   add_foreign_key "recipes", "users"
+  add_foreign_key "reports", "recipes"
+  add_foreign_key "reports", "users", column: "handled_by_id", on_delete: :nullify
+  add_foreign_key "reports", "users", column: "reporter_id", on_delete: :nullify
   add_foreign_key "sessions", "users"
   add_foreign_key "shopping_items", "recipes", on_delete: :nullify
   add_foreign_key "shopping_items", "users"

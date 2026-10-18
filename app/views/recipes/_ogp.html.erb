@@ -1,0 +1,16 @@
+<%# SNS で共有したときに表示される情報(公開中のレシピだけ) %>
+<% description = recipe.description.present? ? truncate(recipe.description.squish, length: 100) : "#{recipe.title}のレシピ。材料#{recipe.ingredients.size}品、#{recipe.steps.size}ステップ。" %>
+<meta name="description" content="<%= description %>">
+<meta property="og:site_name" content="レシピ管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="<%= recipe.title %>">
+<meta property="og:description" content="<%= description %>">
+<meta property="og:url" content="<%= recipe_url(recipe) %>">
+<meta property="og:locale" content="ja_JP">
+<% if recipe.photo.attached? %>
+  <meta property="og:image" content="<%= polymorphic_url(recipe.photo.variant(:medium)) %>">
+  <meta property="og:image:alt" content="<%= recipe.title %>の写真">
+  <meta name="twitter:card" content="summary_large_image">
+<% else %>
+  <meta name="twitter:card" content="summary">
+<% end %>

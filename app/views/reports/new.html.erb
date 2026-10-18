@@ -1,0 +1,22 @@
+<% content_for :title, "レシピを通報する" %>
+<h1>レシピを通報する</h1>
+<p>「<%= link_to @recipe.title, @recipe %>」について、問題があると思う理由を選んでください。管理者が確認し、必要なら非公開にします。通報したことは、作者には知らされません。</p>
+
+<%= form_with model: [ @recipe, @report ] do |form| %>
+  <%= render "shared/errors", record: @report %>
+  <fieldset>
+    <legend>理由(必須)</legend>
+    <% Report::REASONS.each do |value, label| %>
+      <p>
+        <%= form.radio_button :reason, value, required: true %>
+        <%= form.label :reason, label, value: value, class: "inline" %>
+      </p>
+    <% end %>
+  </fieldset>
+  <p>
+    <%= form.label :detail, "くわしい内容(任意・500文字まで)" %>
+    <%= form.text_area :detail, rows: 4, maxlength: 500 %>
+  </p>
+  <p><%= form.submit "通報する" %></p>
+<% end %>
+<p><%= link_to "やめてレシピに戻る", @recipe %></p>

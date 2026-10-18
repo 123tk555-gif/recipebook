@@ -1,0 +1,45 @@
+<% content_for :title, "アカウント設定" %>
+<h1>アカウント設定</h1>
+
+<section aria-labelledby="profile-heading">
+  <h2 id="profile-heading">表示名</h2>
+  <%= form_with model: @user, url: account_path, method: :patch do |form| %>
+    <%= render "shared/errors", record: @user %>
+    <p>
+      <%= form.label :display_name, "表示名(30文字まで。レシピの作者として表示されます)" %>
+      <%= form.text_field :display_name, required: true, maxlength: 30 %>
+    </p>
+    <p>メールアドレス: <%= current_user.email_address %>(ほかの人には表示されません)</p>
+    <p><%= form.submit "表示名を変更する" %></p>
+  <% end %>
+</section>
+
+<section aria-labelledby="withdraw-heading" class="withdraw">
+  <h2 id="withdraw-heading">退会する</h2>
+  <p>退会すると、元には戻せません。次のものは<strong>必ず削除</strong>されます。</p>
+  <ul>
+    <li>メールアドレス・パスワード・表示名</li>
+    <li>非公開のレシピと、ゴミ箱のレシピ</li>
+    <li>お気に入り・買い物リスト・献立</li>
+  </ul>
+  <% public_count = current_user.recipes.publicly_visible.count %>
+  <%= form_with url: account_path, method: :delete,
+                data: { turbo_confirm: "本当に退会しますか? 元には戻せません。" } do |form| %>
+    <fieldset>
+      <legend>公開中のレシピ(<%= public_count %>件)をどうしますか</legend>
+      <p>
+        <%= radio_button_tag :recipes, "keep", true, id: "recipes_keep" %>
+        <%= label_tag :recipes_keep, "残す(作者名を「退会した会員」にして、公開のまま残します。他の人のお気に入りや献立から消えません。あとから削除はできません)", class: "inline" %>
+      </p>
+      <p>
+        <%= radio_button_tag :recipes, "delete", false, id: "recipes_delete" %>
+        <%= label_tag :recipes_delete, "すべて削除する", class: "inline" %>
+      </p>
+    </fieldset>
+    <p>
+      <%= label_tag :password, "確認のため、パスワードを入力してください" %>
+      <%= password_field_tag :password, nil, required: true, autocomplete: "current-password", maxlength: 72 %>
+    </p>
+    <p class="danger"><%= button_tag "退会する", type: "submit", class: "danger" %></p>
+  <% end %>
+</section>
