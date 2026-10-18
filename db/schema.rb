@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_041728) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_042134) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -59,6 +59,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_041728) do
     t.index ["recipe_id"], name: "index_ingredients_on_recipe_id"
   end
 
+  create_table "meal_plans", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "recipe_id", null: false
+    t.date "date", null: false
+    t.integer "slot", default: 0, null: false
+    t.integer "servings"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["recipe_id"], name: "index_meal_plans_on_recipe_id"
+    t.index ["user_id", "date"], name: "index_meal_plans_on_user_id_and_date"
+    t.index ["user_id"], name: "index_meal_plans_on_user_id"
+  end
+
   create_table "recipe_tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "recipe_id", null: false
     t.bigint "tag_id", null: false
@@ -95,6 +108,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_041728) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "shopping_items", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "recipe_id"
+    t.string "name", null: false
+    t.string "quantity"
+    t.boolean "checked", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["recipe_id"], name: "index_shopping_items_on_recipe_id"
+    t.index ["user_id"], name: "index_shopping_items_on_user_id"
+  end
+
   create_table "steps", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "recipe_id", null: false
     t.text "body", null: false
@@ -127,9 +152,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_041728) do
   add_foreign_key "favorites", "recipes"
   add_foreign_key "favorites", "users"
   add_foreign_key "ingredients", "recipes"
+  add_foreign_key "meal_plans", "recipes"
+  add_foreign_key "meal_plans", "users"
   add_foreign_key "recipe_tags", "recipes"
   add_foreign_key "recipe_tags", "tags"
   add_foreign_key "recipes", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "shopping_items", "recipes", on_delete: :nullify
+  add_foreign_key "shopping_items", "users"
   add_foreign_key "steps", "recipes"
 end

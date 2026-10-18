@@ -4,6 +4,8 @@ class User < ApplicationRecord
   has_many :recipes, dependent: :destroy
   has_many :favorites, dependent: :destroy
   has_many :favorite_recipes, through: :favorites, source: :recipe
+  has_many :shopping_items, dependent: :delete_all
+  has_many :meal_plans, dependent: :delete_all
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 

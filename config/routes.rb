@@ -5,6 +5,16 @@ Rails.application.routes.draw do
 
   resources :recipes do
     resource :favorite, only: %i[ create destroy ]
+    resources :shopping_items, only: :create, controller: "recipe_shopping_items"
+  end
+  resources :shopping_items, only: %i[ index create update destroy ] do
+    collection do
+      delete :clear_checked
+      delete :clear_all
+    end
+  end
+  resources :meal_plans, only: %i[ index create destroy ] do
+    collection { post :add_to_shopping_list }
   end
   resources :favorites, only: :index
   resources :tags, only: :index

@@ -1,0 +1,39 @@
+<% content_for :title, "買い物リスト" %>
+<h1>買い物リスト</h1>
+
+<%= form_with model: @item, url: shopping_items_path, class: "inline-form" do |form| %>
+  <%= render "shared/errors", record: @item %>
+  <p>
+    <%= form.label :name, "品名" %>
+    <%= form.text_field :name, required: true, maxlength: 50 %>
+  </p>
+  <p>
+    <%= form.label :quantity, "分量" %>
+    <%= form.text_field :quantity, maxlength: 50 %>
+  </p>
+  <p><%= form.submit "追加する" %></p>
+<% end %>
+
+<% if @items.empty? %>
+  <p>買い物リストは空です。レシピの「買い物リストに追加」か、上の欄から追加できます。</p>
+<% else %>
+  <p><%= @items.count { |i| !i.checked? } %>件が未購入 / 全<%= @items.size %>件</p>
+  <ul class="shopping-list">
+    <% @items.each do |item| %>
+      <li class="<%= "checked" if item.checked? %>">
+        <span class="status"><%= item.checked? ? "[買った]" : "[未購入]" %></span>
+        <span class="name"><%= item.name %></span>
+        <span class="quantity"><%= item.quantity %></span>
+        <% if item.recipe %><span class="source">(<%= item.recipe.title %>)</span><% end %>
+        <%= button_to item.checked? ? "買うものに戻す" : "買った", shopping_item_path(item, checked: !item.checked?), method: :patch,
+                      aria: { label: "#{item.name}を#{item.checked? ? "買うものに戻す" : "買ったものにする"}" } %>
+        <%= button_to "消す", shopping_item_path(item), method: :delete, aria: { label: "#{item.name}を消す" } %>
+      </li>
+    <% end %>
+  </ul>
+  <p class="actions">
+    <%= button_to "買ったものを消す", clear_checked_shopping_items_path, method: :delete %>
+    <%= button_to "すべて消す", clear_all_shopping_items_path, method: :delete,
+                  form: { data: { turbo_confirm: "買い物リストをすべて消します。よろしいですか?" } } %>
+  </p>
+<% end %>

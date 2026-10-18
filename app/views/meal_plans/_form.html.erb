@@ -1,0 +1,23 @@
+<%= form_with model: MealPlan.new, url: meal_plans_path, class: "inline-form" do |form| %>
+  <% if selected_recipe %>
+    <%= form.hidden_field :recipe_id, value: selected_recipe.id %>
+  <% else %>
+    <p>
+      <%= form.label :recipe_id, "レシピ" %>
+      <%= form.select :recipe_id, recipes.map { |r| [ r.title, r.id ] }, {}, required: true %>
+    </p>
+  <% end %>
+  <p>
+    <%= form.label :date, "日付" %>
+    <%= form.date_field :date, value: default_date, required: true %>
+  </p>
+  <p>
+    <%= form.label :slot, "朝・昼・夜" %>
+    <%= form.select :slot, MealPlan::SLOT_NAMES.invert, { selected: "dinner" } %>
+  </p>
+  <p>
+    <%= form.label :servings, "何人分(空欄ならレシピのまま)" %>
+    <%= form.number_field :servings, min: 1, max: 100 %>
+  </p>
+  <p><%= form.submit "献立に追加" %></p>
+<% end %>

@@ -10,6 +10,10 @@ class Recipe < ApplicationRecord
   has_many :recipe_tags, dependent: :destroy
   has_many :tags, through: :recipe_tags
   has_many :favorites, dependent: :destroy
+  # 他の会員の献立に入っていても、レシピを完全に削除したら献立からも外す
+  has_many :meal_plans, dependent: :delete_all
+  # 買い物リストの項目は残す(どのレシピからかの記録だけを外す)
+  has_many :shopping_items, dependent: :nullify
 
   has_one_attached :photo do |attachable|
     attachable.variant :medium, resize_to_limit: [ 1200, 1200 ]

@@ -28,6 +28,8 @@
           <%= link_to "レシピを書く", new_recipe_path %>
           <%= link_to "マイレシピ", my_recipes_path %>
           <%= link_to "お気に入り", favorites_path %>
+          <%= link_to "買い物リスト", shopping_items_path %>
+          <%= link_to "献立", meal_plans_path %>
           <%= link_to "ゴミ箱", trashed_recipes_path %>
           <span class="who"><%= current_user.display_name %> さん</span>
           <%= button_to "ログアウト", session_path, method: :delete, class: "link-button" %>

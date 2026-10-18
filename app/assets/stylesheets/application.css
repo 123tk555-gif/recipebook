@@ -83,3 +83,19 @@ input[type="search"] { width: 100%; font: inherit; padding: 8px; border: 2px sol
 .pager { display: flex; gap: 24px; justify-content: center; margin: 24px 0; }
 .favorite { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 8px 0; }
 .tag-list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 16px; }
+
+.inline-form { display: flex; flex-wrap: wrap; gap: 0 16px; align-items: flex-end; }
+.shopping-list { list-style: none; padding: 0; }
+.shopping-list li { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.shopping-list li form { display: inline; }
+.shopping-list .name { font-weight: bold; }
+.shopping-list li.checked .name, .shopping-list li.checked .quantity { text-decoration: line-through; color: var(--muted); }
+.shopping-list .status { font-family: monospace; }
+.table-wrap { overflow-x: auto; }
+.meal-plan { border-collapse: collapse; width: 100%; min-width: 560px; }
+.meal-plan th, .meal-plan td { border: 2px solid var(--border); padding: 6px 8px; vertical-align: top; text-align: left; }
+.meal-plan tr.today th { background: var(--notice-bg); }
+.meal-plan .plan { margin-bottom: 6px; }
+.meal-plan .plan form { display: inline; }
+.meal-plan .plan button { font-size: 0.8em; padding: 2px 8px; }
+.use-recipe { border: 2px solid var(--border); border-radius: 8px; padding: 0 16px 8px; margin: 16px 0; }

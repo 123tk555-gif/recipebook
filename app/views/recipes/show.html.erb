@@ -33,6 +33,20 @@
     <% end %>
   </ol>
 
+  <% if authenticated? && !@recipe.trashed? %>
+    <section class="use-recipe" aria-labelledby="use-recipe-heading">
+      <h2 id="use-recipe-heading">このレシピを使う</h2>
+      <%= form_with url: recipe_shopping_items_path(@recipe), class: "inline-form" do |form| %>
+        <p>
+          <%= form.label :servings, @recipe.servings ? "何人分の材料を買うか(このレシピは#{@recipe.servings}人分)" : "何人分(このレシピは人数が書かれていないので、分量はそのままです)" %>
+          <%= form.number_field :servings, min: 1, max: 100, value: @recipe.servings, disabled: @recipe.servings.nil? %>
+        </p>
+        <p><%= form.submit "材料を買い物リストに追加" %></p>
+      <% end %>
+      <%= render "meal_plans/form", recipes: [], default_date: Date.current, selected_recipe: @recipe %>
+    </section>
+  <% end %>
+
   <% if @recipe.editable_by?(current_user) %>
     <p class="actions">
       <% if @recipe.trashed? %>
