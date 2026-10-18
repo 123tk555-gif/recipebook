@@ -1,0 +1,11 @@
+<% content_for :title, "タグ一覧" %>
+<h1>タグ一覧</h1>
+<% if @tags.empty? %>
+  <p>まだタグがありません。</p>
+<% else %>
+  <ul class="tag-list">
+    <% @tags.each do |tag| %>
+      <li><%= link_to "##{tag.name}", recipes_path(tag: tag.name), class: "tag" %>(<%= tag.recipes_count %>件)</li>
+    <% end %>
+  </ul>
+<% end %>

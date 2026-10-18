@@ -4,7 +4,9 @@ class RecipesController < ApplicationController
   before_action :set_own_recipe, only: %i[ edit update destroy ]
 
   def index
-    @recipes = Recipe.visible_to(nil).includes(:user, :tags).with_attached_photo.newest_first.limit(50)
+    @search = RecipeSearch.new(search_params)
+    @recipes = @search.results
+    @popular_tags = Tag.popular(15)
   end
 
   def show
@@ -56,6 +58,10 @@ class RecipesController < ApplicationController
     def build_blank_rows(recipe)
       (3 - recipe.ingredients.reject(&:marked_for_destruction?).size).times { recipe.ingredients.build }
       (3 - recipe.steps.reject(&:marked_for_destruction?).size).times { recipe.steps.build }
+    end
+
+    def search_params
+      params.permit(:q, :tag, :max_minutes, :sort, :page)
     end
 
     def recipe_params

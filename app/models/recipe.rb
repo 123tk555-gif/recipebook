@@ -9,6 +9,7 @@ class Recipe < ApplicationRecord
   has_many :steps, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :recipe
   has_many :recipe_tags, dependent: :destroy
   has_many :tags, through: :recipe_tags
+  has_many :favorites, dependent: :destroy
 
   has_one_attached :photo do |attachable|
     attachable.variant :medium, resize_to_limit: [ 1200, 1200 ]

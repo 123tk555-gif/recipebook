@@ -10,12 +10,13 @@
     <% if @recipe.servings %>/ <%= @recipe.servings %>人分<% end %>
     / <strong class="badge"><%= @recipe.published? ? "公開" : "非公開" %></strong>
   </p>
+  <% unless @recipe.trashed? %><%= render "recipes/favorite_button", recipe: @recipe %><% end %>
   <% if @recipe.photo.attached? %>
     <%= image_tag @recipe.photo.variant(:medium), alt: "#{@recipe.title}の写真", class: "photo" %>
   <% end %>
-  <% if @recipe.description.present? %><p><%= simple_format(h(@recipe.description)) %></p><% end %>
+  <% if @recipe.description.present? %><%= simple_format(h(@recipe.description)) %><% end %>
   <% if @recipe.tags.any? %>
-    <p class="tags"><% @recipe.tags.each do |tag| %><span class="tag">#<%= tag.name %></span> <% end %></p>
+    <p class="tags"><% @recipe.tags.each do |tag| %><%= link_to "##{tag.name}", recipes_path(tag: tag.name), class: "tag" %> <% end %></p>
   <% end %>
 
   <h2>材料</h2>

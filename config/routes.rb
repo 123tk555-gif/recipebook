@@ -3,7 +3,11 @@ Rails.application.routes.draw do
   resources :passwords, param: :token
   resource :registration, only: %i[ new create ]
 
-  resources :recipes
+  resources :recipes do
+    resource :favorite, only: %i[ create destroy ]
+  end
+  resources :favorites, only: :index
+  resources :tags, only: :index
   get "my/recipes", to: "my_recipes#index", as: :my_recipes
   resources :trashed_recipes, path: "trash", only: %i[ index destroy ] do
     member { post :restore }
