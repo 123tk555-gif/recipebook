@@ -1,0 +1,16 @@
+<% url = recipe_url(recipe) %>
+<section class="share" aria-labelledby="share-heading" data-controller="clipboard">
+  <h2 id="share-heading">このレシピを共有する</h2>
+  <p>
+    <label for="share-url">このレシピの URL</label>
+    <input id="share-url" type="text" value="<%= url %>" readonly data-clipboard-target="source">
+  </p>
+  <p class="share-buttons">
+    <button type="button" data-action="clipboard#copy">URL をコピー</button>
+    <%= link_to "X で共有(新しいタブ)", "https://x.com/intent/post?#{{ text: recipe.title, url: url }.to_query}",
+                target: "_blank", rel: "noopener noreferrer", class: "button secondary" %>
+    <%= link_to "LINE で送る(新しいタブ)", "https://social-plugins.line.me/lineit/share?#{{ url: url }.to_query}",
+                target: "_blank", rel: "noopener noreferrer", class: "button secondary" %>
+  </p>
+  <p class="copy-status" role="status" aria-live="polite" data-clipboard-target="status"></p>
+</section>

@@ -1,0 +1,42 @@
+<% content_for :title, "会員の一覧(管理)" %>
+<%= render "admin/nav" %>
+<h1>会員の一覧</h1>
+
+<%= form_with url: admin_users_path, method: :get, role: "search" do |form| %>
+  <p>
+    <%= form.label :q, "メールアドレスか表示名で探す" %>
+    <%= form.search_field :q, value: @q %>
+  </p>
+  <p><%= form.submit "探す", name: nil %></p>
+<% end %>
+
+<div class="table-wrap">
+  <table class="admin-table">
+    <caption>新しく登録した順(最大100件)</caption>
+    <thead>
+      <tr><th scope="col">表示名</th><th scope="col">メールアドレス</th><th scope="col">レシピ</th><th scope="col">状態</th><th scope="col">操作</th></tr>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <tr>
+          <th scope="row"><%= user.display_name %></th>
+          <td><%= user.email_address %></td>
+          <td><%= @recipe_counts.fetch(user.id, 0) %>件</td>
+          <td>
+            <% if user.admin? %>管理者<% elsif user.suspended? %><strong>利用停止中</strong><% else %>利用中<% end %>
+          </td>
+          <td>
+            <% if user.admin? %>
+              —
+            <% elsif user.suspended? %>
+              <%= button_to "停止を解除", unsuspend_admin_user_path(user, q: @q), method: :post, form_class: "button_to secondary" %>
+            <% else %>
+              <%= button_to "利用停止にする", suspend_admin_user_path(user, q: @q), method: :post, form_class: "button_to danger",
+                            form: { data: { turbo_confirm: "#{user.display_name}を利用停止にします。ログイン中でもすぐに使えなくなります。" } } %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

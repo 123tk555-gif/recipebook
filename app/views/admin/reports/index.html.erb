@@ -1,0 +1,43 @@
+<% content_for :title, "通報の一覧(管理)" %>
+<%= render "admin/nav" %>
+<h1>通報の一覧</h1>
+
+<nav aria-label="対応状況で絞り込む" class="tabs">
+  <% Report::STATUSES.each do |status, name| %>
+    <%= link_to "#{name}(#{@counts.fetch(status, 0)}件)", admin_reports_path(status: status),
+                aria: { current: (status == @status ? "page" : nil) } %>
+  <% end %>
+</nav>
+
+<% if @reports.empty? %>
+  <p><%= Report::STATUSES.fetch(@status) %>の通報はありません。</p>
+<% else %>
+  <ul class="report-list">
+    <% @reports.each do |report| %>
+      <li class="report">
+        <p class="report-title">
+          <%= link_to report.recipe.title, recipe_path(report.recipe) %>
+          (作者: <%= report.recipe.author_name %>)
+          <% if report.recipe.hidden? %><strong class="badge">管理者が非公開中</strong><% end %>
+        </p>
+        <p class="meta">
+          理由: <strong><%= report.reason_name %></strong> /
+          通報: <%= report.reporter&.display_name || "退会した会員" %> /
+          <%= l(report.created_at, format: :short) %>
+        </p>
+        <% if report.detail.present? %><blockquote><%= simple_format(h(report.detail)) %></blockquote><% end %>
+        <% if report.status_open? %>
+          <div class="actions">
+            <%= button_to "レシピを非公開にする", admin_report_path(report, decision: "hidden"), method: :patch,
+                          form_class: "button_to danger",
+                          form: { data: { turbo_confirm: "「#{report.recipe.title}」を非公開にします。" } } %>
+            <%= button_to "問題なしにする", admin_report_path(report, decision: "dismissed"), method: :patch,
+                          form_class: "button_to secondary" %>
+          </div>
+        <% else %>
+          <p class="meta">対応: <%= report.status_name %>(<%= report.handled_by&.display_name || "—" %>、<%= report.handled_at && l(report.handled_at, format: :short) %>)</p>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>

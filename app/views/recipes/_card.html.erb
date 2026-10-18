@@ -7,7 +7,7 @@
   <div class="card-body">
     <h2><%= link_to recipe.title, recipe %></h2>
     <p class="meta">
-      <%= recipe.user.display_name %> さん
+      <%= recipe.author_name %><%= " さん" if recipe.user %>
       <% if recipe.cooking_minutes %>/ <%= recipe.cooking_minutes %>分<% end %>
       <% if recipe.servings %>/ <%= recipe.servings %>人分<% end %>
       / お気に入り <%= recipe.favorites_count %>
