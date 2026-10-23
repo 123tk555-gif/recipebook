@@ -1,0 +1,10 @@
+# Caddy: 公開の入口。HTTPS を受け持ち、アプリへ中継する。
+# SITE_ADDRESS は .env で決める(例: 52-194-241-136.sslip.io)。":80" なら HTTP だけ。
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+	# 写真は 5MB まで。余裕を見て 10MB を超える送信は断る
+	request_body {
+		max_size 10MB
+	}
+	reverse_proxy app:3000
+}

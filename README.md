@@ -45,3 +45,7 @@ docker compose exec web bin/rails "admin:grant[メールアドレス]"   # 管�
 docker compose exec web bin/rails "admin:revoke[メールアドレス]"  # 管理者から外す(最後の1人は外せない)
 docker compose exec web bin/rails admin:list                     # 管理者の一覧
 ```
+
+## 本番
+
+公開用のサーバーでの設定(`.env`・メール送信・バックアップと戻し方)は [本番運用の手順](docs/本番運用.md) にあります。

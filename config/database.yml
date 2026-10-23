@@ -58,8 +58,8 @@ production:
   primary: &primary_production
     <<: *default
     database: recipebook_production
-    username: recipebook
-    password: <%= ENV["RECIPEBOOK_DATABASE_PASSWORD"] %>
+    username: <%= ENV.fetch("DB_USERNAME", "recipebook") %>
+    password: <%= ENV["DB_PASSWORD"] %>
   cache:
     <<: *primary_production
     database: recipebook_production_cache
@@ -68,6 +68,8 @@ production:
     <<: *primary_production
     database: recipebook_production_queue
     migrations_paths: db/queue_migrate
+    # Solid Queue(Puma の中で動かす)は、ジョブ用の接続を5本以上使う
+    max_connections: <%= ENV.fetch("QUEUE_DB_POOL", 8) %>
   cable:
     <<: *primary_production
     database: recipebook_production_cable
