@@ -49,3 +49,5 @@ docker compose exec web bin/rails admin:list                     # 管理者の�
 ## 本番
 
 公開用のサーバーでの設定(`.env`・メール送信・バックアップと戻し方)は [本番運用の手順](docs/本番運用.md) にあります。
+
+AWS への公開と、サーバーの操作(更新・止める・バックアップなど)は [AWS 公開手順](docs/AWS公開手順.md) にあります。
