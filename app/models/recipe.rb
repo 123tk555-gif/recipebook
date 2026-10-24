@@ -1,6 +1,8 @@
 class Recipe < ApplicationRecord
   TRASH_DAYS = 30
   MAX_TAGS = 10
+  MAX_INGREDIENTS = 50
+  MAX_STEPS = 50
   PHOTO_TYPES = %w[image/jpeg image/png image/webp].freeze
   PHOTO_MAX_BYTES = 5.megabytes
 
@@ -34,6 +36,7 @@ class Recipe < ApplicationRecord
   validates :servings, numericality: { only_integer: true, in: 1..100 }, allow_nil: true
   validate :photo_is_acceptable
   validate :tag_count_is_within_limit
+  validate :rows_are_within_limit
 
   after_save :purge_photo_if_requested
 
@@ -171,5 +174,12 @@ class Recipe < ApplicationRecord
 
   def tag_count_is_within_limit
     errors.add(:tag_list, "は #{MAX_TAGS} 個までです") if @tag_names_too_many
+  end
+
+  # 材料・手順の数の上限(保存しない枠は数えない)。ボタンで枠を増やせるので、サーバー側でも確かめる
+  def rows_are_within_limit
+    kept = ->(rows) { rows.reject(&:marked_for_destruction?).size }
+    errors.add(:ingredients, "は #{MAX_INGREDIENTS} 個までです") if kept.call(ingredients) > MAX_INGREDIENTS
+    errors.add(:steps, "は #{MAX_STEPS} 個までです") if kept.call(steps) > MAX_STEPS
   end
 end
