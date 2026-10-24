@@ -1,0 +1,11 @@
+<%# 手順の枠 1つ分。f は fields_for のフォームビルダー(新しい枠のひな形では、番号が NEW_RECORD になる) %>
+<% number = f.index.is_a?(Integer) ? f.index + 1 : "" %>
+<% removed = f.object.marked_for_destruction? %>
+<div class="row step-row" role="group" aria-label="手順 <%= number %>" data-nested-form-target="row" <%= "hidden" if removed %>>
+  <%= f.hidden_field :id if f.object.persisted? %>
+  <%= f.label :body, "手順#{number}", data: { nested_form_target: "label" } %>
+  <%= f.text_area :body, rows: 2, maxlength: 1000 %>
+  <%= f.hidden_field :position, value: f.index.is_a?(Integer) ? f.index : 0, data: { nested_form_target: "position" } %>
+  <%= f.hidden_field :_destroy, value: removed ? "1" : "0", data: { nested_form_target: "destroy" } %>
+  <button type="button" class="secondary remove-row" data-action="nested-form#remove" aria-label="手順 <%= number %> を削除">削除</button>
+</div>

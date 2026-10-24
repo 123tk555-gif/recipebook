@@ -22,34 +22,36 @@
     <%= form.text_field :tag_list %>
   </p>
 
-  <fieldset>
-    <legend>材料</legend>
-    <%= form.fields_for :ingredients do |f| %>
-      <div class="row">
-        <%= f.label :name, "材料名" %>
-        <%= f.text_field :name, maxlength: 50 %>
-        <%= f.label :quantity, "分量" %>
-        <%= f.text_field :quantity, maxlength: 30 %>
-        <%= f.hidden_field :position, value: f.index %>
-        <% if f.object.persisted? %>
-          <%= f.check_box :_destroy %><%= f.label :_destroy, "削除する" %>
-        <% end %>
-      </div>
-    <% end %>
+  <fieldset data-controller="nested-form" data-nested-form-max-value="<%= Recipe::MAX_INGREDIENTS %>" data-nested-form-name-value="材料">
+    <legend>材料(<%= Recipe::MAX_INGREDIENTS %>個まで)</legend>
+    <div data-nested-form-target="list">
+      <%= form.fields_for :ingredients, include_id: false do |f| %>
+        <%= render "recipes/ingredient_fields", f: f %>
+      <% end %>
+    </div>
+    <template data-nested-form-target="template">
+      <%= form.fields_for :ingredients, Ingredient.new, child_index: "NEW_RECORD", include_id: false do |f| %>
+        <%= render "recipes/ingredient_fields", f: f %>
+      <% end %>
+    </template>
+    <p><button type="button" class="secondary" data-action="nested-form#add" data-nested-form-target="addButton">＋ 材料の枠を追加</button></p>
+    <p class="row-status" role="status" aria-live="polite" data-nested-form-target="status"></p>
   </fieldset>
 
-  <fieldset>
-    <legend>作り方</legend>
-    <%= form.fields_for :steps do |f| %>
-      <div class="row">
-        <%= f.label :body, "手順#{f.index + 1}" %>
-        <%= f.text_area :body, rows: 2, maxlength: 1000 %>
-        <%= f.hidden_field :position, value: f.index %>
-        <% if f.object.persisted? %>
-          <%= f.check_box :_destroy %><%= f.label :_destroy, "削除する" %>
-        <% end %>
-      </div>
-    <% end %>
+  <fieldset data-controller="nested-form" data-nested-form-max-value="<%= Recipe::MAX_STEPS %>" data-nested-form-name-value="手順">
+    <legend>作り方(<%= Recipe::MAX_STEPS %>手順まで)</legend>
+    <div data-nested-form-target="list">
+      <%= form.fields_for :steps, include_id: false do |f| %>
+        <%= render "recipes/step_fields", f: f %>
+      <% end %>
+    </div>
+    <template data-nested-form-target="template">
+      <%= form.fields_for :steps, Step.new, child_index: "NEW_RECORD", include_id: false do |f| %>
+        <%= render "recipes/step_fields", f: f %>
+      <% end %>
+    </template>
+    <p><button type="button" class="secondary" data-action="nested-form#add" data-nested-form-target="addButton">＋ 手順の枠を追加</button></p>
+    <p class="row-status" role="status" aria-live="polite" data-nested-form-target="status"></p>
   </fieldset>
 
   <p>

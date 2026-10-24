@@ -1,0 +1,13 @@
+<%# 材料の枠 1つ分。f は fields_for のフォームビルダー(新しい枠のひな形では、番号が NEW_RECORD になる) %>
+<% number = f.index.is_a?(Integer) ? f.index + 1 : "" %>
+<% removed = f.object.marked_for_destruction? %>
+<div class="row ingredient-row" role="group" aria-label="材料 <%= number %>" data-nested-form-target="row" <%= "hidden" if removed %>>
+  <%= f.hidden_field :id if f.object.persisted? %>
+  <%= f.label :name, "材料名" %>
+  <%= f.text_field :name, maxlength: 50 %>
+  <%= f.label :quantity, "分量" %>
+  <%= f.text_field :quantity, maxlength: 30 %>
+  <%= f.hidden_field :position, value: f.index.is_a?(Integer) ? f.index : 0, data: { nested_form_target: "position" } %>
+  <%= f.hidden_field :_destroy, value: removed ? "1" : "0", data: { nested_form_target: "destroy" } %>
+  <button type="button" class="secondary remove-row" data-action="nested-form#remove" aria-label="材料 <%= number %> を削除">削除</button>
+</div>
