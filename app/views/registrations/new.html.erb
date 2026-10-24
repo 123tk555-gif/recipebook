@@ -18,6 +18,7 @@
     <%= form.label :password_confirmation, "パスワード(確認)" %>
     <%= form.password_field :password_confirmation, required: true, minlength: 8, maxlength: 72, autocomplete: "new-password" %>
   </p>
+  <p class="meta">登録すると、<%= link_to "利用規約", terms_path, target: "_blank", rel: "noopener noreferrer" %>と<%= link_to "プライバシーポリシー", privacy_path, target: "_blank", rel: "noopener noreferrer" %>(どちらも新しいタブで開きます)に同意したものとみなします。</p>
   <p><%= form.submit "登録する" %></p>
 <% end %>
 <p>登録済みの方は <%= link_to "ログイン", new_session_path %></p>

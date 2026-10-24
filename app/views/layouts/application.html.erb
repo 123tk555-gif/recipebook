@@ -61,5 +61,13 @@
       <% if alert.present? %><p class="flash alert" role="alert">エラー: <%= alert %></p><% end %>
       <%= yield %>
     </main>
+
+    <footer class="site-footer">
+      <nav aria-label="サイトの案内">
+        <%= link_to "利用規約", terms_path %>
+        <%= link_to "プライバシーポリシー", privacy_path %>
+      </nav>
+      <p>© レシピ管理</p>
+    </footer>
   </body>
 </html>

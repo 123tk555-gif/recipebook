@@ -233,3 +233,14 @@ input[type="radio"] { width: 1.2em; height: 1.2em; vertical-align: middle; accen
 /* ---- 退会 ---- */
 .withdraw { margin-top: 32px; }
 .withdraw form { border-left: 6px solid var(--danger); }
+
+/* ---- フッター・規約のページ ---- */
+.site-footer { max-width: 1080px; margin: 0 auto; padding: 16px; border-top: 2px solid var(--line); color: var(--muted); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; }
+.site-footer nav { display: flex; flex-wrap: wrap; gap: 4px 20px; }
+.site-footer p { margin: 0; }
+.prose { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 8px 24px 20px; max-width: 800px; margin: 0 auto; }
+.prose h2 { border-bottom: 2px solid var(--line); padding-bottom: 4px; margin-top: 28px; }
+.plain-table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
+.plain-table caption { text-align: left; font-family: var(--serif); font-weight: bold; padding: 4px 0; }
+.plain-table th, .plain-table td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
+.plain-table thead th { background: var(--tag-bg); }
