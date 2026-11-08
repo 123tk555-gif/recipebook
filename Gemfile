@@ -5,7 +5,7 @@ gem "rails", "~> 8.1.4"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use trilogy as the database for Active Record
-gem "trilogy", "~> 2.7"
+gem "trilogy", "~> 2.13"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 
